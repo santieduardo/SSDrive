@@ -6,8 +6,8 @@ import java.rmi.RemoteException;
 public interface DocumentoInterface extends Remote {
 	
 	public String getConteudoDocumento() throws RemoteException;
-	public void setConteudoDocumento(String conteudoDocumento);
+	public void setConteudoDocumento(String conteudoDocumento) throws RemoteException;
 	public String getTituloDocumento() throws RemoteException;	
-	public void setTituloDocumento(String tituloDocumento);
+	public void setTituloDocumento(String tituloDocumento) throws RemoteException;
 	
 }

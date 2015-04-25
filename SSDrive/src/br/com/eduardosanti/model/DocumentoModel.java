@@ -20,7 +20,7 @@ public class DocumentoModel extends UnicastRemoteObject implements DocumentoInte
 	}
 
 	@Override
-	public void setConteudoDocumento(String conteudo) {
+	public void setConteudoDocumento(String conteudo) throws RemoteException{
 		this.conteudo = conteudo;
 	}
 
@@ -30,7 +30,7 @@ public class DocumentoModel extends UnicastRemoteObject implements DocumentoInte
 	}
 
 	@Override
-	public void setTituloDocumento(String titulo) {
+	public void setTituloDocumento(String titulo) throws RemoteException{
 		this.titulo = titulo;
 	}
 

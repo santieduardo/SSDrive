@@ -1,5 +1,7 @@
 package br.com.eduardosanti.controller;
 
+import br.com.eduardosanti.server.Cliente;
+
 public class DashboardController {
 	
 	private String tituloDocumento;
@@ -12,6 +14,9 @@ public class DashboardController {
 	public DashboardController(String titulo, String conteudo){
 		this.tituloDocumento = titulo;
 		this.conteudoDocumento = conteudo;
+		
+		Cliente c = new Cliente();
+		c.chamaCli(this.tituloDocumento, this.conteudoDocumento);
 	}
 	
 	public String getConteudoDocumento() {

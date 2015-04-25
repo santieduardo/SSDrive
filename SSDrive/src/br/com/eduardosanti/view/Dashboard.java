@@ -13,9 +13,15 @@ import javax.swing.JTextArea;
 import javax.swing.JButton;
 
 import br.com.eduardosanti.controller.DashboardController;
+import br.com.eduardosanti.interfaces.DocumentoInterface;
+import br.com.eduardosanti.server.Cliente;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 import javax.swing.JRadioButton;
 
@@ -76,15 +82,29 @@ public class Dashboard extends JFrame {
 					String titulo = textFieldTitulo.getText();
 					String conteudo = textAreaConteudo.getText();
 					DashboardController dashboard = new DashboardController(titulo, conteudo);
+					
 				}
 			}
 		});
 		btnSalvar.setBounds(466, 62, 89, 23);
 		contentPane.add(btnSalvar);
 		
-		JButton btnExcluir = new JButton("Excluir");
-		btnExcluir.setBounds(466, 130, 89, 23);
-		contentPane.add(btnExcluir);
+		JButton btnBuscar = new JButton("Buscar");
+		btnBuscar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					DocumentoInterface doc = (DocumentoInterface) Naming.lookup("rmi://localhost:1099/Doc");
+					textFieldTitulo.setText(doc.getTituloDocumento());
+					textAreaConteudo.setText(doc.getConteudoDocumento());
+				} catch (MalformedURLException | RemoteException
+						| NotBoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnBuscar.setBounds(466, 130, 89, 23);
+		contentPane.add(btnBuscar);
 		
 		JButton btnLimpar = new JButton("Limpar");
 		btnLimpar.addActionListener(new ActionListener() {

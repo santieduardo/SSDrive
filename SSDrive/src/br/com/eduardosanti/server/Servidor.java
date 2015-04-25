@@ -16,9 +16,8 @@ public static void main(String[] args) {
             DocumentoInterface docInterface = new DocumentoModel();
             LocateRegistry.createRegistry(1099);
             try {
-                Naming.rebind("Hello", docInterface);
+                Naming.rebind("Doc", docInterface);
                 System.out.println("Servidor iniciado!");
-              
             } catch (MalformedURLException ex) {
                 ex.printStackTrace();
             }

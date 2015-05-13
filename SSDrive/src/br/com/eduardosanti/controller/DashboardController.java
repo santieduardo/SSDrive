@@ -1,5 +1,7 @@
 package br.com.eduardosanti.controller;
 
+import java.io.Serializable;
+
 import br.com.eduardosanti.server.Cliente;
 
 public class DashboardController {

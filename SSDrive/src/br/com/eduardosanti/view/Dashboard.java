@@ -18,6 +18,8 @@ import br.com.eduardosanti.server.Cliente;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -34,34 +36,20 @@ public class Dashboard extends JFrame {
 	private JTextField textFieldTitulo;
 	private JTextArea textAreaConteudo;
 	private DashboardController dashboard = new DashboardController();
-
+	DocumentoInterface doc;
 	
 	public static void main(String[] args) {
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+
 					Dashboard frame = new Dashboard();
 					
 					frame.setVisible(true);
 					frame.setTitle("Dashboard");
 					
-					
-					TimerTask enviarDados = new TimerTask() {
-						
-						@Override
-						public void run() {
-							frame.sendToServer();
-							frame.repaint();
-						
-							System.out.println("ENVIEI");
-						}
-					};
-					
-					
-					
-					TimerTask receberDados = new TimerTask() {
-						
+					TimerTask receberDados = new TimerTask() {						
 						@Override
 						public void run() {
 							try {
@@ -69,18 +57,16 @@ public class Dashboard extends JFrame {
 								frame.repaint();
 								
 								System.out.println("RECEBI");
-							} catch (MalformedURLException | RemoteException
-									| NotBoundException e) {
+							} catch (RemoteException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 							
 						}
 					};
-					Timer timerEnviar = new Timer();
-					timerEnviar.scheduleAtFixedRate(enviarDados, 10000, 10000);
-					//Timer timerReceber = new Timer();
-					//timerReceber.scheduleAtFixedRate(receberDados, 3000, 3000);
+					
+					Timer timerReceber = new Timer();
+					timerReceber.scheduleAtFixedRate(receberDados, 5000, 5000);
 					
 				
 					
@@ -91,20 +77,26 @@ public class Dashboard extends JFrame {
 		});
 	}
 
-	public void sendToServer(){
+	public void sendToServer() throws RemoteException{
 		String titulo = textFieldTitulo.getText();
 		String conteudo = textAreaConteudo.getText();
 		
-		dashboard.setTituloDocumento(titulo);
-		dashboard.setConteudoDocumento(conteudo);
+		//dashboard.setTituloDocumento(titulo);
+		//dashboard.setConteudoDocumento(conteudo);
+		doc.setConteudoDocumento(conteudo);
+		doc.setTituloDocumento(titulo);
+				
 		System.err.println("send titulo " + titulo);
 		System.err.println("send conteudo " + conteudo);
 	}
 	
-	public void receiveFromServer() throws MalformedURLException, RemoteException, NotBoundException{
-		DocumentoInterface doc = (DocumentoInterface) Naming.lookup("rmi://localhost:1099/Doc");
+	public void receiveFromServer() throws RemoteException {
+		
 		textFieldTitulo.setText(doc.getTituloDocumento());
+		textFieldTitulo.setCaretPosition(textFieldTitulo.getDocument().getLength());
+		
 		textAreaConteudo.setText(doc.getConteudoDocumento());
+		textAreaConteudo.setCaretPosition(textAreaConteudo.getDocument().getLength());
 		System.out.println("1 " + doc.getTituloDocumento());
 		System.out.println("11 " + doc.getConteudoDocumento());
 	}
@@ -113,9 +105,12 @@ public class Dashboard extends JFrame {
 	 * Create the frame.
 	 */
 	public Dashboard() {
+		
+		iniciaConexaoServidor();
+		
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 581, 366);
+		setBounds(100, 100, 620, 556);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -126,59 +121,89 @@ public class Dashboard extends JFrame {
 		contentPane.add(lblTituloDoDocumento);
 		
 		textFieldTitulo = new JTextField();
-		textFieldTitulo.setBounds(152, 8, 335, 20);
+		textFieldTitulo.setBounds(152, 8, 305, 20);
 		contentPane.add(textFieldTitulo);
 		textFieldTitulo.setColumns(10);
+		textFieldTitulo.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				try {
+					doc.setTituloDocumento(textFieldTitulo.getText());
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		
 		JLabel lblContedo = new JLabel("Conte\u00FAdo:");
 		lblContedo.setBounds(10, 36, 102, 14);
 		contentPane.add(lblContedo);
 		
 		textAreaConteudo = new JTextArea();
-		textAreaConteudo.setBounds(10, 61, 447, 191);
+		textAreaConteudo.setBounds(10, 61, 594, 456);
+		textAreaConteudo.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+						
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				try {
+					doc.setConteudoDocumento(textAreaConteudo.getText());
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		contentPane.add(textAreaConteudo);
 		
-		JButton btnSalvar = new JButton("Salvar");
-		btnSalvar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				while (true){
-					String titulo = textFieldTitulo.getText();
-					String conteudo = textAreaConteudo.getText();
-					
-					dashboard.setTituloDocumento(titulo);
-					dashboard.setConteudoDocumento(conteudo);
-				}
-			}
-		});
-		btnSalvar.setBounds(466, 62, 89, 23);
-		contentPane.add(btnSalvar);
-		
-		JButton btnBuscar = new JButton("Buscar");
-		btnBuscar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					DocumentoInterface doc = (DocumentoInterface) Naming.lookup("rmi://localhost:1099/Doc");
-					textFieldTitulo.setText(doc.getTituloDocumento());
-					textAreaConteudo.setText(doc.getConteudoDocumento());
-				} catch (MalformedURLException | RemoteException
-						| NotBoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		btnBuscar.setBounds(466, 130, 89, 23);
-		contentPane.add(btnBuscar);
-		
-		JButton btnLimpar = new JButton("Limpar");
+		JButton btnLimpar = new JButton("Limpar Tudo");
 		btnLimpar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				textAreaConteudo.setText("");
-				textFieldTitulo.setText("");
+				try {
+					doc.setTituloDocumento("");
+					doc.setConteudoDocumento("");
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				textFieldTitulo.requestFocus();
 			}
 		});
-		btnLimpar.setBounds(467, 96, 89, 23);
+		btnLimpar.setBounds(494, 7, 110, 23);
 		contentPane.add(btnLimpar);
+	}
+
+	private void iniciaConexaoServidor() {
+		try {
+			doc = (DocumentoInterface) Naming.lookup("rmi://localhost:1099/Doc");
+		} catch (MalformedURLException | RemoteException | NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
 }
